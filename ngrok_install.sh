@@ -10,6 +10,7 @@ function InstallEpel {
     sed -i "s/#baseurl/baseurl/g" /etc/yum.repos.d/epel.repo
     sed -i "s/mirrorlist/#mirrorlist/g" /etc/yum.repos.d/epel.repo
     sed -i "s#http://download.fedoraproject.org/pub#https://mirrors.tuna.tsinghua.edu.cn#g" /etc/yum.repos.d/epel.repo
+		yum makecache
 }
 if [ $# != 1 ];then
 	ErrorOutput "$0 DomainName"
@@ -57,7 +58,7 @@ GOOS=darwin GOARCH=amd64 make release-client
 StandardOutput "Compiler ARM Client program..."
 GOOS=linux GOARCH=arm make release-client
 cat > ngrok.cfg << EOF
-server_addr: "$NGROK_DOMAIN:4443"
+server_addr: "$NGROK_DOMAIN:8080"
 trust_host_root_certs: false
 
 tunnels:
@@ -153,15 +154,15 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/ngrok/bin/ngrokd -domain=$NGROK_DOMAIN -log /tmp/ngrokd/ngrokd.log
-# ExecStart=/usr/local/ngrok/bin/ngrokd -domain="ng.ywclub.org" -tunnelAddr=":8080"
+# ExecStart=/usr/local/ngrok/bin/ngrokd -domain=$NGROK_DOMAIN -log /tmp/ngrokd/ngrokd.log
+ExecStart=/usr/local/ngrok/bin/ngrokd -domain="$NGROK_DOMAIN" -tunnelAddr=":8080" -log /tmp/ngrokd/ngrokd.log
 # ExecStart=/usr/local/ngrok/bin/ngrokd -domain="$NGROK_DOMAIN" -httpAddr=":8080" -httpsAddr=":6061" -tunnelAddr=":6062" -tlsKey=./device.key -tlsCrt=./device.crt
 ExecStop=kill -9 \`ps -aux | egrep ngrokd | grep -v 'grep' | awk '{print \$2}'\`
 
 [Install]
 WantedBy=multi-user.target
 EOF
-[ -d /tmp/ngrokd/ ] && mkdir -p /tmp/ngrokd/
+[ -d /tmp/ngrokd/ ] || mkdir -p /tmp/ngrokd/
 touch /tmp/ngrokd/ngrokd.log
 systemctl daemon-reload
 StandardOutput "------------------How to run the server-------------------"
