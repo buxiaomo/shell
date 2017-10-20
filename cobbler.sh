@@ -121,3 +121,14 @@ systemctl enable dhcpd.service tftp.socket cobblerd.service httpd.service
 # cobbler repo add --name=MySql65 --mirror=https://repo.mysql.com/yum/mysql-5.6-community/el/7/x86_64/
 # cobbler reposync --only=ONLY
 # cobbler sync
+
+
+cobbler system add \
+--name=test10.CentOS-7.3.1611-x86_64 \
+--profile=CentOS-7.3.1611-x86_64 \
+--mac=00:50:56:37:E0:C1 \
+--interface=eth0 \
+--ip-address=10.3.236.11 \
+--hostname=test10 \
+--gateway=10.3.236.254 \
+--dns-name=202.103.24.68 --static=1
