@@ -15,6 +15,7 @@ sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
+apt-get update
 apt-get install docker-ce
 
 # vim /etc/docker/daemon.json
@@ -30,3 +31,7 @@ systemctl start docker.service
 curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 curl -L https://raw.githubusercontent.com/docker/compose/1.16.1/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+
+
+
+docker service create --name xiaomo --publish 443:8388 --mode global -e PASSWORD=xiaomo --detach=false daocloud.io/buxiaomo/ssserver:2.8.2
