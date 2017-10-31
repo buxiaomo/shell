@@ -1,4 +1,5 @@
 #!/bin/bash
+# docker-engine
 apt-get update
 apt-get dist-upgrade -y
 apt-get install apt-transport-https ca-certificates -y
@@ -9,6 +10,7 @@ apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual -y
 apt-get install linux-image-generic-lts-xenial -y
 apt-get install docker-engine -y
 
+# docker-ce
 apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common -y
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository \
@@ -18,20 +20,16 @@ sudo add-apt-repository \
 apt-get update
 apt-get install docker-ce -y
 
-# vim /etc/docker/daemon.json
-
-Aliyun_Quicken='https://i3jtbyvy.mirror.aliyuncs.com'
-systemctl disable docker.service
-systemctl stop docker.service
-sed -i "s|ExecStart=/usr/bin/dockerd*|ExecStart=/usr/bin/dockerd --registry-mirror=${Aliyun_Quicken} -H unix:///var/run/docker.sock|g" /lib/systemd/system/docker.service
-systemctl daemon-reload
-systemctl enable docker.service
-systemctl start docker.service
-
+vim /etc/docker/daemon.json
+{
+  "registry-mirrors" : [
+    "https://i3jtbyvy.mirror.aliyuncs.com"
+  ],
+  "debug" : true,
+  "experimental" : true
+}
+systemctl restart docker
+# docker-compose
 curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 curl -L https://raw.githubusercontent.com/docker/compose/1.16.1/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
-
-
-
-docker service create --name xiaomo --publish 443:8388 --mode global -e PASSWORD=xiaomo --detach=false daocloud.io/buxiaomo/ssserver:2.8.2
