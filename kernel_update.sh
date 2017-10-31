@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# CentOS
 # import key
 rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
 # install elrepo repo
@@ -8,8 +8,10 @@ rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
 yum --enablerepo=elrepo-kernel install kernel-lt kernel-lt-headers kernel-lt-devel -y
 
 # modify grub
-grub2-set-default 0
-KERNEL_VERSION=
+# grub2-set-default 0
+# KERNEL_VERSION=
+
+# Ubuntu
 wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.10/linux-image-4.10.0-041000-generic_4.10.0-041000.201702191831_amd64.deb
 dpkg -i linux-image-4.10.0
 dpkg -l|grep linux-image
