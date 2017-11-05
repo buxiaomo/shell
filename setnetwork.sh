@@ -9,13 +9,16 @@ nmcli connection modify static ipv4.dns ${DNS}
 nmcli connection modify ${Con_Name} connection.autoconnect no
 systemctl restart network
 
+nmcli connection add con-name static \
+autoconnect yes ifname eno16777728 \
+type ethernet ip4 '10.10.10.3/24' gw4 10.10.10.1
 
 hostnamectl set-hostname host42.paas.local
 nmcli connection add con-name static \
 ipv4.method manual \
 type ethernet autoconnect yes \
-ifname ens32 ipv4.addresses '10.3.236.252/24' \
-ipv4.gateway 10.3.236.254 \
+ifname eno16777728 ipv4.addresses '10.10.10.3/24' \
+ipv4.gateway 10.10.10.1 \
 ipv4.dns 202.103.24.68
 nmcli connection modify ens32 autoconnect no
 yum update  -y
