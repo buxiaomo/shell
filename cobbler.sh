@@ -5,38 +5,38 @@ function StandardOutput {
 function ErrorOutput {
 	echo -e "\033[31m$1!!!\033[0m"
 }
-function ImportISOImage {
-	mkdir -p /mnt
-	StandardOutput "import CentOS-7-x86_64-DVD-1511"
-	if [ -e ./CentOS-7-x86_64-DVD-1511.iso ]
-		wget -O ./CentOS-7-x86_64-DVD-1511.iso http://vault.centos.org/7.2.1511/isos/x86_64/CentOS-7-x86_64-DVD-1511.iso
-		mount ./CentOS-7-x86_64-DVD-1511.iso /mnt
-		cobbler import --name=CentOS-7.2.1511-x86_64 --path=/mnt/
-		umount /mnt
-	fi
-	StandardOutput "import CentOS-7-x86_64-DVD-1611"
-	if [ -e ./CentOS-7-x86_64-DVD-1611.iso ]
-		wget -O ./CentOS-7-x86_64-DVD-1611.iso http://vault.centos.org/7.3.1611/isos/x86_64/CentOS-7-x86_64-DVD-1611.iso
-		mount ./CentOS-7-x86_64-DVD-1611.iso /mnt
-		cobbler import --name=CentOS-7.3.1611-x86_64 --path=/mnt/
-		umount /mnt
-	fi
-	StandardOutput "import CentOS-7-x86_64-DVD-1708"
-	if [ -e ./CentOS-7-x86_64-DVD-1708.iso ]
-		wget -O ./CentOS-7-x86_64-DVD-1708.iso https://mirrors.tuna.tsinghua.edu.cn/centos/7.4.1708/isos/x86_64/CentOS-7-x86_64-DVD-1708.iso
-		mount ./CentOS-7-x86_64-DVD-1708.iso /mnt
-		cobbler import --name=CentOS-7.4.1708-x86_64 --path=/mnt/
-		umount /mnt
-	fi
-	StandardOutput "import Ubuntu-16.04.2-x86_64"
-	if [ -e ./ubuntu-16.04.2-server-amd64.iso ]
-		wget -O ./ubuntu-16.04.2-server-amd64.iso http://vault.centos.org/7.3.1611/isos/x86_64/CentOS-7-x86_64-DVD-1611.iso
-		mount ubuntu-16.04.2-server-amd64.iso /mnt
-		cobbler import --name=Ubuntu-16.04.2-x86_64 --path=/mnt/
-		umount /mnt
-	fi
-	cobbler sync
-}
+# function ImportISOImage {
+# 	mkdir -p /mnt
+# 	StandardOutput "import CentOS-7-x86_64-DVD-1511"
+# 	if [ -e ./CentOS-7-x86_64-DVD-1511.iso ]
+# 		wget -O ./CentOS-7-x86_64-DVD-1511.iso http://vault.centos.org/7.2.1511/isos/x86_64/CentOS-7-x86_64-DVD-1511.iso
+# 		mount ./CentOS-7-x86_64-DVD-1511.iso /mnt
+# 		cobbler import --name=CentOS-7.2.1511-x86_64 --path=/mnt/
+# 		umount /mnt
+# 	fi
+# 	StandardOutput "import CentOS-7-x86_64-DVD-1611"
+# 	if [ -e ./CentOS-7-x86_64-DVD-1611.iso ]
+# 		wget -O ./CentOS-7-x86_64-DVD-1611.iso http://vault.centos.org/7.3.1611/isos/x86_64/CentOS-7-x86_64-DVD-1611.iso
+# 		mount ./CentOS-7-x86_64-DVD-1611.iso /mnt
+# 		cobbler import --name=CentOS-7.3.1611-x86_64 --path=/mnt/
+# 		umount /mnt
+# 	fi
+# 	StandardOutput "import CentOS-7-x86_64-DVD-1708"
+# 	if [ -e ./CentOS-7-x86_64-DVD-1708.iso ]
+# 		wget -O ./CentOS-7-x86_64-DVD-1708.iso https://mirrors.tuna.tsinghua.edu.cn/centos/7.4.1708/isos/x86_64/CentOS-7-x86_64-DVD-1708.iso
+# 		mount ./CentOS-7-x86_64-DVD-1708.iso /mnt
+# 		cobbler import --name=CentOS-7.4.1708-x86_64 --path=/mnt/
+# 		umount /mnt
+# 	fi
+# 	StandardOutput "import Ubuntu-16.04.2-x86_64"
+# 	if [ -e ./ubuntu-16.04.2-server-amd64.iso ]
+# 		wget -O ./ubuntu-16.04.2-server-amd64.iso http://vault.centos.org/7.3.1611/isos/x86_64/CentOS-7-x86_64-DVD-1611.iso
+# 		mount ubuntu-16.04.2-server-amd64.iso /mnt
+# 		cobbler import --name=Ubuntu-16.04.2-x86_64 --path=/mnt/
+# 		umount /mnt
+# 	fi
+# 	cobbler sync
+# }
 StandardOutput "Install net-tools package"
 yum install net-tools -y
 IP=`ifconfig | awk '/inet\>/{print $2}' | grep -v 127.0.0.1`
