@@ -1,0 +1,4 @@
+[docker]
+name=Docker
+baseurl=file:///mnt/docker
+gpgcheck=0
