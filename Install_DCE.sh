@@ -22,7 +22,7 @@ nmcli con add con-name bond1-slave1 type bond-slave ifname ens38 master bond1
 
 
 # Set variable
-DEV_NAME=/dev/sda3
+DEV_NAME=/dev/sdc1
 DOCKER_VERSION=17.03.1.ce
 NFS_SERVER=10.10.1.100
 # Set sshd
