@@ -1,6 +1,6 @@
 #!/bin/bash
-DNS='172.1.1.2'
-GW='172.1.1.2'
+DNS='192.168.0.1'
+GW='192.168.0.10'
 Device_Name=`nmcli connection show | grep -v NAME |awk '{print $4}' | grep -v '\-\-'`
 Con_Name=`nmcli connection show | grep -v NAME |awk '{print $1}'`
 
@@ -13,13 +13,13 @@ nmcli connection add con-name static \
 autoconnect yes ifname eno16777728 \
 type ethernet ip4 '10.10.10.3/24' gw4 10.10.10.1
 
-hostnamectl set-hostname host42.paas.local
+hostnamectl set-hostname splunkserver
 nmcli connection add con-name static \
 ipv4.method manual \
 type ethernet autoconnect yes \
-ifname eno16777728 ipv4.addresses '10.10.10.3/24' \
-ipv4.gateway 10.10.10.1 \
-ipv4.dns 202.103.24.68
+ifname eno16777728 ipv4.addresses '192.168.0.10/24' \
+ipv4.gateway 192.168.0.1 \
+ipv4.dns 192.168.0.1
 nmcli connection modify ens32 autoconnect no
 yum update  -y
 reboot

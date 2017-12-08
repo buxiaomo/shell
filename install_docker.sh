@@ -1,4 +1,5 @@
 #!/bin/bash
+# apt autoremove
 yum --version &> /dev/null
 if [ $? == 0 ];
     CMD=yum
@@ -12,9 +13,14 @@ case ${CMD} in
         yum -y install docker-ce
     ;;
     apt )
+        apt-get remove docker docker-engine docker.io -y
+        apt-get update
         apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common -y
-        curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
-        add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        # curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+        apt-key fingerprint 0EBFCD88
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        # add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
         apt-get update
         apt-get install docker-ce -y
     ;;
