@@ -5,21 +5,10 @@ rpm -ivh kernel-devel-3.10.0-514.el7.x86_64.rpm
 
 yum install bash-completion vim wget -y
 # Set Network
-00:50:56:88:93:14
-00:50:56:88:8D:EC
 nmcli con add con-name bond0 type bond ifname bond0 mode 1 ip4 192.168.0.53/24 gw4 192.168.0.1
 nmcli connection modify bond0 ipv4.dns 192.168.0.1
 nmcli con add con-name bond0-slave0 type bond-slave ifname ens32 master bond0
 nmcli con add con-name bond0-slave1 type bond-slave ifname ens36 master bond0
-
-px
-00:50:56:20:C8:A5
-00:50:56:32:85:43
-
-nmcli con add con-name bond1 type bond ifname bond1 mode 1 ip4 10.0.10.3/24
-nmcli con add con-name bond1-slave0 type bond-slave ifname ens37 master bond1
-nmcli con add con-name bond1-slave1 type bond-slave ifname ens38 master bond1
-
 
 # Set variable
 DEV_NAME=/dev/sdc1
