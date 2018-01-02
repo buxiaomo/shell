@@ -28,17 +28,20 @@ esac
 
 cat > /etc/docker/daemon.json << EOF
 {
-"registry-mirrors" : [
-"https://i3jtbyvy.mirror.aliyuncs.com"
-],
-"debug" : true,
-"experimental" : true
+    "registry-mirrors" : [
+        "https://i3jtbyvy.mirror.aliyuncs.com"
+    ],
+    "debug" : true,
+    "experimental" : true
 }
 EOF
 # docker-compose
 curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 curl -L https://raw.githubusercontent.com/docker/compose/1.16.1/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+
+
+export LC_CTYPE="en_US.UTF-8"
 
 # # SSR
 # sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
