@@ -45,7 +45,7 @@ StandardOutput "Stop firewalld service"
 systemctl stop firewalld.service
 systemctl disable firewalld.service
 StandardOutput "Check SELinux"
-if [ `getenforce` = "Enforcing" ];then
+if [ $(getenforce) == "Enforcing" ];then
 	StandardOutput "Setting SELinux"
 	sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
 	StandardOutput "reboot your system an run again"
