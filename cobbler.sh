@@ -1,10 +1,104 @@
 #!/bin/bash
-function StandardOutput {
-	echo -e "\033[32m$1\033[0m"
+function StandardOutput() {
+		echo -e "\033[32m$1\033[0m"
 }
-function ErrorOutput {
-	echo -e "\033[31m$1!!!\033[0m"
+function ErrorOutput() {
+		echo -e "\033[31m$1!!!\033[0m"
 }
+function Check_OS() {
+		yum install redhat-lsb-core -y
+		OS=$(lsb_release -i  | awk -F 'ID:.' '{print $2}')
+		RELEASE=$(lsb_release -r | awk -F ' ' '{print $NF}')
+		if [[ ${OS} != 'CentOS' ]] && [[ ${RELEASE} != '7.2.1611' ]];then
+				echo "Please use OS where CentOS 7.2"
+				exit 1
+		fi
+}
+function Install_Base() {
+		StandardOutput "Base Configure"
+		yum install epel-release ca-certificates -y
+		sed -i "s/#baseurl/baseurl/g" /etc/yum.repos.d/epel.repo
+		sed -i "s/mirrorlist/#mirrorlist/g" /etc/yum.repos.d/epel.repo
+		sed -i "s#http://download.fedoraproject.org/pub#https://mirrors.tuna.tsinghua.edu.cn#g" /etc/yum.repos.d/epel.repo
+		yum install net-tools -y
+		systemctl stop firewalld.service
+		systemctl disable firewalld.service
+		if [ $(getenforce) == "Enforcing" ];then
+				StandardOutput "Setting SELinux"
+				sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
+				StandardOutput "reboot your system an run again"
+				exit 1
+		fi
+}
+function Install_Cobbler() {
+		StandardOutput "Install Cobbler"
+		yum install cobbler cobbler-web dhcp pykickstart wget perl bzip2 ed patch perl-Compress-Zlib perl-Digest-MD5 perl-Digest-SHA1 perl-libwww-perl perl-LockFile-Simple -y
+}
+
+function Configure_Cobbler() {
+		StandardOutput "Configure Cobbler"
+		systemctl restart cobblerd.service httpd.service
+		IP=$(ifconfig | awk '/inet\>/{print $2}' | grep -v 127.0.0.1)
+		Cobbler_PASSWORD=$(openssl passwd -1 -salt '123456' "root")
+		cp /etc/cobbler/settings /etc/cobbler/settings.bak
+		sed -i "s/next_server: 127.0.0.1/next_server: ${IP}/g" /etc/cobbler/settings
+		sed -i "s/server: 127.0.0.1/server: ${IP}/g" /etc/cobbler/settings
+		sed -i "s|default_password_crypted:.*|default_password_crypted: '${Cobbler_PASSWORD}'|" /etc/cobbler/settings
+		sed -i 's/pxe_just_once: 0/pxe_just_once: 1/g' /etc/cobbler/settings
+		# DHCP
+		Cobbler_DHCP_SUBNET=$(ifconfig  | grep inet | grep -vE 'inet6|127.0.0.1' | awk '{print $2}' | awk -F '.' '{print $1"."$2"."$3"."0}')
+		Cobbler_DHCP_ROUTER=$(route -n | grep -E '^0.0.0.0' | awk  '{print $2}')
+		Cobbler_DHCP_DNS=114.114.114.114
+		Cobbler_DHCP_RANGE="$(ifconfig  | grep inet | grep -vE 'inet6 | 127.0.0.1' | awk '{print $2}' | awk -F '.' '{print $1"."$2"."$3"."200}') $(ifconfig  | grep inet | grep -vE 'inet6 | 127.0.0.1' | awk '{print $2}' | awk -F '.' '{print $1"."$2"."$3"."250}')"
+		sed -i 's/manage_dhcp: 0/manage_dhcp: 1/g' /etc/cobbler/settings
+		sed -i "s/192.168.1.0/${Cobbler_DHCP_SUBNET}/" /etc/cobbler/dhcp.template
+		sed -i "s/192.168.1.5/${Cobbler_DHCP_ROUTER}/" /etc/cobbler/dhcp.template
+		sed -i "s/192.168.1.1;/${Cobbler_DHCP_DNS};/" /etc/cobbler/dhcp.template
+		sed -i "s/192.168.1.100 192.168.1.254/${Cobbler_DHCP_RANGE}/" /etc/cobbler/dhcp.template
+		cobbler get-loaders
+		if [ $? != 0 ];then
+				wget -O /var/lib/cobbler/loaders/README http://cobbler.github.io/loaders/README
+				wget -O /var/lib/cobbler/loaders/COPYING.elilo http://cobbler.github.io/loaders/COPYING.elilo
+				wget -O /var/lib/cobbler/loaders/COPYING.yaboot http://cobbler.github.io/loaders/COPYING.yaboot
+				wget -O /var/lib/cobbler/loaders/COPYING.syslinux http://cobbler.github.io/loaders/COPYING.syslinux
+				wget -O /var/lib/cobbler/loaders/elilo-ia64.efi http://cobbler.github.io/loaders/elilo-3.8-ia64.efi
+				wget -O /var/lib/cobbler/loaders/yaboot http://cobbler.github.io/loaders/yaboot-1.3.17
+				wget -O /var/lib/cobbler/loaders/pxelinux.0 http://cobbler.github.io/loaders/pxelinux.0-3.86
+				wget -O /var/lib/cobbler/loaders/menu.c32 http://cobbler.github.io/loaders/menu.c32-3.86
+				wget -O /var/lib/cobbler/loaders/grub-x86.efi http://cobbler.github.io/loaders/grub-0.97-x86.efi
+				wget -O /var/lib/cobbler/loaders/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
+		fi
+		StandardOutput "Setting Rsyncd"
+		systemctl enable rsyncd.service
+		rpm -ivh ftp://rpmfind.net/linux/epel/5/x86_64/debmirror-20090807-1.el5.noarch.rpm
+		if [ $? = 0 ];then
+				sed -i 's|@dists=.*|#@dists=|' /etc/debmirror.conf
+				sed -i 's|@arches=.*|#@arches=|' /etc/debmirror.conf
+		fi
+		cobbler signature update
+		cobbler sync
+		systemctl restart dhcpd.service tftp.socket cobblerd.service httpd.service
+		systemctl enable dhcpd.service tftp.socket cobblerd.service httpd.service
+}
+
+case $1 in
+		install )
+				Check_OS
+				Install_Base
+				Install_Cobbler
+				Configure_Cobbler
+		;;
+		download )
+				echo "download"
+		;;
+		import )
+				echo "import"
+		;;
+		* )
+				echo "$0 install|download|import"
+		;;
+esac
+
 # function ImportISOImage {
 # 	mkdir -p /mnt
 # 	StandardOutput "import CentOS-7-x86_64-DVD-1511"
@@ -37,122 +131,8 @@ function ErrorOutput {
 # 	fi
 # 	cobbler sync
 # }
-StandardOutput "Install net-tools package"
-yum install net-tools -y
-IP=`ifconfig | awk '/inet\>/{print $2}' | grep -v 127.0.0.1`
-passwd=`openssl passwd -1 -salt 'random-phrase-here' 'root'`
-StandardOutput "Stop firewalld service"
-systemctl stop firewalld.service
-systemctl disable firewalld.service
-StandardOutput "Check SELinux"
-if [ $(getenforce) == "Enforcing" ];then
-	StandardOutput "Setting SELinux"
-	sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
-	StandardOutput "reboot your system an run again"
-	exit 1
-fi
-StandardOutput "Install epel"
-yum install epel-release ca-certificates -y
-sed -i "s/#baseurl/baseurl/g" /etc/yum.repos.d/epel.repo
-sed -i "s/mirrorlist/#mirrorlist/g" /etc/yum.repos.d/epel.repo
-sed -i "s#http://download.fedoraproject.org/pub#https://mirrors.tuna.tsinghua.edu.cn#g" /etc/yum.repos.d/epel.repo
-StandardOutput "Install Cobbler"
-yum install cobbler pykickstart wget -y
-systemctl restart cobblerd.service httpd.service
-cp /etc/cobbler/settings /etc/cobbler/settings.bak
-StandardOutput "Setting Cobbler"
-sed -i "s/next_server: 127.0.0.1/next_server: ${IP}/g" /etc/cobbler/settings
-sed -i "s/server: 127.0.0.1/server: ${IP}/g" /etc/cobbler/settings
-cobbler get-loaders
-if [ $? != 0 ];then
-	wget -O /var/lib/cobbler/loaders/README http://cobbler.github.io/loaders/README
-	wget -O /var/lib/cobbler/loaders/COPYING.elilo http://cobbler.github.io/loaders/COPYING.elilo
-	wget -O /var/lib/cobbler/loaders/COPYING.yaboot http://cobbler.github.io/loaders/COPYING.yaboot
-	wget -O /var/lib/cobbler/loaders/COPYING.syslinux http://cobbler.github.io/loaders/COPYING.syslinux
-	wget -O /var/lib/cobbler/loaders/elilo-ia64.efi http://cobbler.github.io/loaders/elilo-3.8-ia64.efi
-	wget -O /var/lib/cobbler/loaders/yaboot http://cobbler.github.io/loaders/yaboot-1.3.17
-	wget -O /var/lib/cobbler/loaders/pxelinux.0 http://cobbler.github.io/loaders/pxelinux.0-3.86
-	wget -O /var/lib/cobbler/loaders/menu.c32 http://cobbler.github.io/loaders/menu.c32-3.86
-	wget -O /var/lib/cobbler/loaders/grub-x86.efi http://cobbler.github.io/loaders/grub-0.97-x86.efi
-	wget -O /var/lib/cobbler/loaders/grub-x86_64.efi http://cobbler.github.io/loaders/grub-0.97-x86_64.efi
-fi
-StandardOutput "Setting TFTP"
-cat > /etc/xinetd.d/tftp << EOF
-# default: off
-# description: The tftp server serves files using the trivial file transfer \
-#       protocol.  The tftp protocol is often used to boot diskless \
-#       workstations, download configuration files to network-aware printers, \
-#       and to start the installation process for some operating systems.
-service tftp
-{
-        socket_type             = dgram
-        protocol                = udp
-        wait                    = yes
-        user                    = root
-        server                  = /usr/sbin/in.tftpd
-        server_args             = -s /var/lib/tftpboot
-        disable                 = no
-        per_source              = 11
-        cps                     = 100 2
-        flags                   = IPv4
-}
-EOF
-StandardOutput "Setting Rsyncd"
-systemctl enable rsyncd.service &> /dev/null
-yum install perl bzip2 ed patch perl-Compress-Zlib perl-Digest-MD5 perl-Digest-SHA1 perl-libwww-perl perl-LockFile-Simple -y
-rpm -ivh ftp://rpmfind.net/linux/epel/5/x86_64/debmirror-20090807-1.el5.noarch.rpm
-if [ $? = 0 ];then
-	sed -i 's|@dists=.*|#@dists=|' /etc/debmirror.conf
-	sed -i 's|@arches=.*|#@arches=|' /etc/debmirror.conf
-fi
-sed -i "s|default_password_crypted:.*|default_password_crypted: '${passwd}'|" /etc/cobbler/settings
-StandardOutput "Install DHCP"
-yum -y install dhcp
-StandardOutput "Setting DHCP"
-cat > /etc/dhcp/dhcpd.conf << EOF
-# ******************************************************************
-# Cobbler managed dhcpd.conf file
-#
-# generated from cobbler dhcp.conf template ($date)
-# Do NOT make changes to /etc/dhcpd.conf. Instead, make your changes
-# in /etc/cobbler/dhcp.template, as /etc/dhcpd.conf will be
-# overwritten.
-#
-# ******************************************************************
-ddns-update-style interim;
-allow booting;
-allow bootp;
-ignore client-updates;
-set vendorclass = option vendor-class-identifier;
-option pxe-system-type code 93 = unsigned integer 16;
-subnet `ifconfig  | grep inet | grep -vE 'inet6|127.0.0.1' | awk '{print $2}' | awk -F '.' '{print $1"."$2"."$3"."0}'` netmask 255.255.255.0 {
-     option routers             ${IP};
-     option domain-name-servers 114.114.114.114;
-     option subnet-mask         255.255.255.0;
-     range dynamic-bootp        `ifconfig  | grep inet | grep -vE 'inet6|127.0.0.1' | awk '{print $2}' | awk -F '.' '{print $1"."$2"."$3"."200}'` `ifconfig  | grep inet | grep -vE 'inet6|127.0.0.1' | awk '{print $2}' | awk -F '.' '{print $1"."$2"."$3"."254}'`;
-     default-lease-time         21600;
-     max-lease-time             43200;
-     next-server                ${IP};
-     class "pxeclients" {
-          match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
-          if option pxe-system-type = 00:02 {
-                  filename "ia64/elilo.efi";
-          } else if option pxe-system-type = 00:06 {
-                  filename "grub/grub-x86.efi";
-          } else if option pxe-system-type = 00:07 {
-                  filename "grub/grub-x86_64.efi";
-          } else {
-                  filename "pxelinux.0";
-          }
-     }
-}
-EOF
-StandardOutput "Install Cobbler Web"
-yum install cobbler-web -y
-cobbler signature update &> /dev/null
-systemctl restart dhcpd.service tftp.socket cobblerd.service httpd.service &> /dev/null
-systemctl enable dhcpd.service tftp.socket cobblerd.service httpd.service &> /dev/null
-cobbler sync
+
+
 #
 #
 # scp root@10.10.10.250:/vmfs/volumes/59bfa1e4-79708ae6-2e6f-f44d306e0bac/CentOS-7-x86_64-DVD-1511.iso \
