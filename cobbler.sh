@@ -43,7 +43,7 @@ function Configure_Cobbler() {
 		cp /etc/cobbler/settings /etc/cobbler/settings.bak
 		sed -i "s/next_server: 127.0.0.1/next_server: ${IP}/g" /etc/cobbler/settings
 		sed -i "s/server: 127.0.0.1/server: ${IP}/g" /etc/cobbler/settings
-		sed -i "s|default_password_crypted:.*|default_password_crypted: '${Cobbler_PASSWORD}'|" /etc/cobbler/settings
+		sed -i "s|default_password_crypted:.*|default_password_crypted: '${Cobbler_PASSWORD}'|g" /etc/cobbler/settings
 		sed -i 's/pxe_just_once: 0/pxe_just_once: 1/g' /etc/cobbler/settings
 		# DHCP
 		Cobbler_DHCP_SUBNET=$(ifconfig  | grep inet | grep -vE 'inet6|127.0.0.1' | awk '{print $2}' | awk -F '.' '{print $1"."$2"."$3"."0}')

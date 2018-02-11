@@ -23,11 +23,11 @@ function skybluecolor {
 }
 
 # Splunk Configuration
-HOSTNAME=searchhead
-SPLUNK_MASTER_IP=10.0.7.1
-DEPLOYMENT_SERVER_IP=10.0.7.1
-SPLUNK_USER=admin
-SPLUNK_PASS=ExpertInsight
+HOSTNAME=index01
+SPLUNK_MASTER_IP=172.16.0.12
+DEPLOYMENT_SERVER_IP=172.16.0.12
+SPLUNK_USER=splunk
+SPLUNK_PASS=splunk
 INSTALL_HOME=/opt
 SPLUNK_HOME=${INSTALL_HOME}/splunk
 
@@ -46,18 +46,18 @@ if [ $# -eq 0 ];then
 fi
 case $1 in
     server )
-        SPLUNK_URL=https://download.splunk.com/products/splunk/releases/7.0.0/linux/splunk-7.0.0-c8a78efdd40f-Linux-x86_64.tgz
-        SPLUNK_DOWNLOAD_FILENAME=/usr/local/src/splunk-7.0.0-c8a78efdd40f-Linux-x86_64.tgz
+        SPLUNK_URL=https://download.splunk.com/products/splunk/releases/7.0.2/linux/splunk-7.0.2-03bbabbd5c0f-Linux-x86_64.tgz
+        SPLUNK_DOWNLOAD_FILENAME=/usr/local/src/splunk-7.0.2-03bbabbd5c0f-Linux-x86_64.tgz
         SPLUNK_HOME=${INSTALL_HOME}/splunk
     ;;
     indexer )
-        SPLUNK_URL=https://download.splunk.com/products/splunk/releases/7.0.0/linux/splunk-7.0.0-c8a78efdd40f-Linux-x86_64.tgz
-        SPLUNK_DOWNLOAD_FILENAME=/usr/local/src/splunk-7.0.0-c8a78efdd40f-Linux-x86_64.tgz
+        SPLUNK_URL=https://download.splunk.com/products/splunk/releases/7.0.2/linux/splunk-7.0.2-03bbabbd5c0f-Linux-x86_64.tgz
+        SPLUNK_DOWNLOAD_FILENAME=/usr/local/src/splunk-7.0.2-03bbabbd5c0f-Linux-x86_64.tgz
         SPLUNK_HOME=${INSTALL_HOME}/splunk
     ;;
     forwarder )
-        SPLUNK_URL=http://file.splunk.org.cn/splunkforward/splunkforwarder-7.0.0-c8a78efdd40f-Linux-x86_64.tgz
-        SPLUNK_DOWNLOAD_FILENAME=/usr/local/src/splunkforwarder-7.0.0-c8a78efdd40f-Linux-x86_64.tgz
+        SPLUNK_URL=https://download.splunk.com/products/universalforwarder/releases/7.0.2/linux/splunkforwarder-7.0.2-03bbabbd5c0f-Linux-x86_64.tgz
+        SPLUNK_DOWNLOAD_FILENAME=/usr/local/src/splunkforwarder-7.0.2-03bbabbd5c0f-Linux-x86_64.tgz
         SPLUNK_HOME=${INSTALL_HOME}/splunkforwarder
     ;;
 esac
@@ -93,11 +93,11 @@ fi
 # sed -i "s/server 3.centos.pool.ntp.org iburst/server ntp3.aliyun.com iburst/g" /etc/ntp.conf
 # systemctl restart ntpd.service
 # systemctl enable ntpd.service
-yum install wget -y
+apt-get install wget -y
 # yum update -y
 # Splunk
-adduser ${SPLUNK_USER}
-echo "${SPLUNK_PASS}" | passwd --stdin ${SPLUNK_USER}
+useradd ${SPLUNK_USER} -p ${SPLUNK_PASS}
+# echo "${SPLUNK_PASS}" | passwd --stdin ${SPLUNK_USER}
 # hostnamectl set-hostname ${HOSTNAME}
 
 wget -O ${SPLUNK_DOWNLOAD_FILENAME} ${SPLUNK_URL}
@@ -136,10 +136,10 @@ EOF
         su - ${SPLUNK_USER} -c "${SPLUNK_HOME}/bin/splunk restart"
         # mkdir -p /opt/frozen/web
         # chown -R admin.admin /opt/frozen/web
-        /opt/splunk/bin/splunk add index web \
-        -maxTotalDataSizeMB 60000 \
-        -maxDataSize 3000 \
-        -coldToFrozenDir /opt/frozen/web -auth admin:ExpertInsight
+        # /opt/splunk/bin/splunk add index web \
+        # -maxTotalDataSizeMB 60000 \
+        # -maxDataSize 3000 \
+        # -coldToFrozenDir /opt/frozen/web -auth admin:ExpertInsight
         cat > /etc/profile.d/splunk.sh <<EOF
 export SPLUNK_HOME=/opt/splunk
 export PATH=\$SPLUNK_HOME/bin:\$PATH
@@ -150,8 +150,8 @@ EOF
         su - ${SPLUNK_USER} -c "${SPLUNK_HOME}/bin/splunk edit user admin -password '${SPLUNK_PASS}' -role admin -auth admin:changeme"
         su - ${SPLUNK_USER} -c "${SPLUNK_HOME}/bin/splunk set servername LIUPENG-${HOSTNAME} -auth admin:${SPLUNK_PASS}"
         su - ${SPLUNK_USER} -c "${SPLUNK_HOME}/bin/splunk set deploy-poll ${DEPLOYMENT_SERVER_IP}:8089 -auth admin:${SPLUNK_PASS}"
-        # su - ${SPLUNK_USER} -c "${SPLUNK_HOME}/bin/splunk add forward-server 192.168.0.11:9997"
-        # su - ${SPLUNK_USER} -c "${SPLUNK_HOME}/bin/splunk add forward-server 192.168.0.12:9997"
+        su - ${SPLUNK_USER} -c "${SPLUNK_HOME}/bin/splunk add forward-server 172.16.0.13:9997"
+        su - ${SPLUNK_USER} -c "${SPLUNK_HOME}/bin/splunk add forward-server 172.16.0.14:9997"
         su - ${SPLUNK_USER} -c "${SPLUNK_HOME}/bin/splunk restart"
         cat > /etc/profile.d/splunkforwarder.sh <<EOF
 export SPLUNK_HOME=/opt/splunkforwarder
