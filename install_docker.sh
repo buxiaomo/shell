@@ -11,6 +11,42 @@ case ${CMD} in
         yum install -y yum-utils device-mapper-persistent-data lvm2 curl
         yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
         yum -y install docker-ce
+        vgcreate docker /dev/sdb
+        lvcreate --wipesignatures y -n root -l 95%VG docker
+        lvcreate --wipesignatures y -n rootmeta -l 1%VG docker
+        lvscan
+        lvconvert -y --zero n -c 512K --thinpool docker/root --poolmetadata docker/rootmeta
+        if [ ! -e /etc/lvm/profile/docker-thinpool.profile ];then
+            cat > /etc/lvm/profile/docker-thinpool.profile << EOF
+activation {
+    thin_pool_autoextend_threshold=80
+    thin_pool_autoextend_percent=20
+}
+EOF
+        fi
+        lvchange --metadataprofile docker-thinpool docker/root
+        lvs -o+seg_monitor
+        mkdir -p /var/lib/docker.bak
+        mv /var/lib/docker/* /var/lib/docker.bak
+        rm -rf /var/lib/docker/*
+        cat > /etc/docker/daemon.json << EOF
+{
+  "storage-driver": "devicemapper",
+  "storage-opts": [
+     "dm.thinpooldev=/dev/mapper/docker-root",
+     "dm.use_deferred_removal=true",
+     "dm.use_deferred_deletion=true",
+     "dm.basesize=50G"
+   ],
+    "registry-mirrors" : [
+        "https://i3jtbyvy.mirror.aliyuncs.com"
+    ],
+    "insecure-registries": [
+        "0.0.0.0/0"
+    ],
+   "debug" : true
+}
+EOF
     ;;
     apt )
         locale-gen en_US.UTF-8
@@ -22,21 +58,24 @@ case ${CMD} in
         curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
         apt-key fingerprint 0EBFCD88
         # add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+        sudo add-apt-repository \
+   "deb [arch=amd64] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
         apt-get update
         apt-get install docker-ce -y
     ;;
 esac
 systemctl stop docker
-echo "/dev/vdb1 /var/lib/docker xfs defaults 0 0" >> /etc/fstab
+echo "/dev/sda1 /var/lib/docker xfs defaults 0 0" >> /etc/fstab
 cat > /etc/docker/daemon.json << EOF
 {
     "registry-mirrors" : [
         "https://i3jtbyvy.mirror.aliyuncs.com"
     ],
     "insecure-registries" : [
-        "hub.xmitd.com"
-      ],
+        "0.0.0.0/0"
+    ],
     "debug" : true,
     "experimental" : true
 }
