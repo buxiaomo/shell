@@ -26,3 +26,6 @@ do
     # tar -Jvcf ${backup_time}.sql.tar.xz ${backup_time}.sql
 done
 exit 0
+
+
+find /log -type f -mtime +30 -name "*.zip" -exec rm -rf { } \;

@@ -4,7 +4,8 @@ GW='192.168.0.10'
 Device_Name=`nmcli connection show | grep -v NAME |awk '{print $4}' | grep -v '\-\-'`
 Con_Name=`nmcli connection show | grep -v NAME |awk '{print $1}'`
 
-nmcli connection add con-name static type ethernet autoconnect yes ifname ${Device_Name}   ip4 $1'/24' gw4 ${GW}
+nmcli connection add con-name static \
+type ethernet autoconnect yes ifname ${Device_Name}   ip4 $1'/24' gw4 ${GW}
 nmcli connection modify static ipv4.dns 114.114.114.114
 nmcli connection modify eno16777728 connection.autoconnect no
 systemctl restart network

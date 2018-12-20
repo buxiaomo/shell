@@ -17,7 +17,7 @@ cat > /etc/profile.d/kafka.sh << EOF
 export KAFKA_HOME=/usr/local/kafka
 export PATH=\$PATH:\$KAFKA_HOME/bin
 EOF
-
+# 
 cat > /etc/systemd/system/kafka.service << EOF
 [Unit]
 Description=Kafka
@@ -26,10 +26,11 @@ After=zookeeper.target
 
 [Service]
 Type=simple
-WorkingDirectory=/usr/local/kafka
 ExecStart=/usr/local/kafka/bin/kafka-server-start.sh /usr/local/kafka/config/server.properties
 ExecStop=/bin/kill -SIGTERM $MAINPID
-RestartSec=10s
+RestartSec=15
+SuccessExitStatus=0 143
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target

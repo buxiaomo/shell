@@ -5,10 +5,10 @@ rpm -ivh kernel-devel-3.10.0-514.el7.x86_64.rpm
 
 yum install bash-completion vim wget -y
 # Set Network
-nmcli con add con-name bond0 type bond ifname bond0 mode 1 ip4 192.168.0.53/24 gw4 192.168.0.1
-nmcli connection modify bond0 ipv4.dns 192.168.0.1
-nmcli con add con-name bond0-slave0 type bond-slave ifname ens32 master bond0
-nmcli con add con-name bond0-slave1 type bond-slave ifname ens36 master bond0
+nmcli con add con-name bond0 type bond ifname bond0 mode 1 ip4 10.76.95.131/25 gw4 10.76.95.254
+nmcli connection modify bond0 ipv4.dns 10.72.1.10
+nmcli con add con-name bond0-slave0 type bond-slave ifname enp2s0f1 master bond0
+nmcli con add con-name bond0-slave1 type bond-slave ifname enp2s0f0 master bond0
 
 # Set variable
 DEV_NAME=/dev/sdc1
@@ -44,8 +44,8 @@ yum install docker-engine-selinux-${DOCKER_VERSION}* docker-engine-${DOCKER_VERS
 # Set Docker Sotrage devie
 systemctl stop docker.service
 if [ -e ${DEV_NAME} ];then
-    pvcreate ${DEV_NAME}
-    vgcreate docker ${DEV_NAME}
+    pvcreate /dev/sdf2
+    vgcreate docker /dev/sdf2
     lvcreate --wipesignatures y -n root -l 95%VG docker
     lvcreate --wipesignatures y -n rootmeta -l 1%VG docker
     lvscan
@@ -72,17 +72,15 @@ if [ -e /etc/docker/daemon.json ];then
     touch /etc/docker/daemon.json
     cat > /etc/docker/daemon.json << EOF
 {
-  "registry-mirrors" : [
-    "https://i3jtbyvy.mirror.aliyuncs.com"
-  ],
-  "storage-driver": "devicemapper",
-  "storage-opts": [
-     "dm.thinpooldev=/dev/mapper/docker-root",
-     "dm.use_deferred_removal=true",
-     "dm.use_deferred_deletion=true"
-   ],
-   "debug" : true,
-   "experimental" : true
+    "storage-driver": "devicemapper",
+    "storage-opts": [
+        "dm.fs=xfs",
+        "dm.thinpooldev=/dev/mapper/docker--vg-docker--pool",
+        "dm.use_deferred_removal=true"
+    ],
+    "insecure-registries": [
+        "0.0.0.0/0"
+    ],
 }
 EOF
 fi
@@ -147,3 +145,16 @@ mkdir /mnt/nfs
 mount ${NFS_SERVER}:/nfs /mnt/nfs
 echo "${NFS_SERVER}:/nfs /mnt/nfs nfs defaults 0 0" >> /etc/fs
 df -h | grep nfs
+
+
+
+I use OVM 
+
+
+sed -i "s/iface ens3 inet.*/iface ens3 inet static/g" /etc/network/interfaces
+echo "address $1
+netmask 255.255.0.0
+gateway 10.0.1.1
+dns-nameserver 10.0.1.1" >> /etc/network/interfaces
+echo "systemctl restart networking.service"
+
