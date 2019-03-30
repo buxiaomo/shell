@@ -70,22 +70,30 @@ systemctl stop docker
 echo "/dev/sda1 /var/lib/docker xfs defaults 0 0" >> /etc/fstab
 cat > /etc/docker/daemon.json << EOF
 {
-    "registry-mirrors" : [
-        "https://i3jtbyvy.mirror.aliyuncs.com"
-    ],
-    "insecure-registries" : [
-        "0.0.0.0/0"
-    ],
-    "debug" : true,
-    "experimental" : true
+  "registry-mirrors": [
+    "https://i3jtbyvy.mirror.aliyuncs.com"
+  ],
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m",
+    "max-file": "3"
+  },
+  "insecure-registries": [
+    "0.0.0.0/0"
+  ],
+  "debug": true
 }
 EOF
 systemctl restart docker
 
 # docker-compose
-curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
-curl -L https://raw.githubusercontent.com/docker/compose/1.16.1/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+curl -L https://raw.githubusercontent.com/docker/compose/1.23.2/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
 
 
 export LC_CTYPE="en_US.UTF-8"
@@ -93,7 +101,9 @@ export LC_CTYPE="en_US.UTF-8"
 # # SSR
 # sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
 # sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-# echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
+
+{:>?p/
+\]{+_0';Y8E35# echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
 # echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
 # sysctl -p
 
