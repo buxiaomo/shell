@@ -1,4 +1,0 @@
-[base]
-name=CentOS
-baseurl=file:///mnt/centos
-gpgcheck=1

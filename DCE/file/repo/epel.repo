@@ -1,4 +1,0 @@
-[epel]
-name=epel
-baseurl=file:///mnt/epel
-gpgcheck=0
