@@ -9,4 +9,4 @@ apt-get update
 apt-get install nginx -y
 wget https://raw.githubusercontent.com/buxiaomo/v2ray/master/nginx.conf -O /etc/nginx/nginx.conf
 rm -rf /etc/nginx/conf.d/default.conf
-bash <(curl -L -s https://install.direct/go.sh)
+curl -L -s https://install.direct/go.sh | bash
