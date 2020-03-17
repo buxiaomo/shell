@@ -9,4 +9,8 @@ apt-get update
 apt-get install nginx -y
 wget https://raw.githubusercontent.com/buxiaomo/v2ray/master/nginx.conf -O /etc/nginx/nginx.conf
 rm -rf /etc/nginx/conf.d/default.conf
+systemctl restart nginx
+systemctl enable nginx
 curl -L -s https://install.direct/go.sh | bash
+systemctl restart v2ray
+systemctl enable v2ray
