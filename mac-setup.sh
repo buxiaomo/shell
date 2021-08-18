@@ -6,34 +6,34 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 # Install Package
-brew cask install google-chrome
-brew cask install zoomus
-brew cask install iterm2
-brew cask install docker
-brew cask install postman
-brew cask install notion
-brew cask install telegram-desktop
-brew cask install shiftit
-brew cask install visual-studio-code
-brew cask install sourcetree
-brew cask install cheatsheet
-brew cask install dash
-brew cask install microsoft-outlook
-brew cask install microsoft-powerpoint
-brew cask install microsoft-word
-brew cask install microsoft-auto-update
-brew cask install pycharm
-brew cask install goland
-brew cask install qq
-brew cask install wechat
-brew cask install wechatwork
-brew cask install qqmusic
-brew cask install qqlive
-brew cask install bartender
-brew cask install istat-menus
-brew cask install tunnelblick
-brew cask install balenaetcher
-brew cask install parallels
+brew install --cask google-chrome
+brew install --cask zoomus
+brew install --cask iterm2
+brew install --cask docker
+brew install --cask postman
+brew install --cask notion
+brew install --cask telegram-desktop
+brew install --cask shiftit
+brew install --cask visual-studio-code
+brew install --cask sourcetree
+brew install --cask cheatsheet
+brew install --cask dash
+brew install --cask microsoft-outlook
+brew install --cask microsoft-powerpoint
+brew install --cask microsoft-word
+brew install --cask microsoft-auto-update
+brew install --cask pycharm
+brew install --cask goland
+brew install --cask qq
+brew install --cask wechat
+brew install --cask wechatwork
+brew install --cask qqmusic
+brew install --cask qqlive
+brew install --cask bartender
+brew install --cask istat-menus
+brew install --cask tunnelblick
+brew install --cask balenaetcher
+brew install --cask parallels
 
 # Install tools
 brew install wget telnet curl zsh terraform go python@3 node kubernetes-cli
