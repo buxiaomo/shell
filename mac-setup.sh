@@ -43,7 +43,7 @@ brew install yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cl
 
 # Install Fonts
 brew tap homebrew/cask-fonts
-brew cask install font-open-sans
+brew install --cask font-open-sans
 
 # Install sshpass
 brew tap esolitos/ipa
