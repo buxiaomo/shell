@@ -39,7 +39,7 @@ brew install --cask qqlive
 brew install --cask qiyimedia
 
 # Install tools
-brew install jq wget telnet curl zsh terraform go python@3 node kubernetes-cli
+brew install yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cli
 
 # Install Fonts
 brew tap homebrew/cask-fonts
