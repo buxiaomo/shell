@@ -16,11 +16,7 @@ brew install --cask sourcetree pycharm goland visual-studio-code postman docker
 
 brew install --cask qq wechat wechatwork telegram-desktop
 
-brew install --cask bartender
-brew install --cask istat-menus
-brew install --cask tunnelblick
-brew install --cask balenaetcher
-brew install --cask parallels
+brew install --cask bartender istat-menus tunnelblick balenaetcher parallels
 
 brew install --cask qqmusic qqlive qiyimedia
 
