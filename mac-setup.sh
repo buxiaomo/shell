@@ -7,7 +7,6 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 
 # Install Package
 brew install --cask google-chrome
-brew install --cask zoomus
 brew install --cask iterm2
 brew install --cask notion
 
@@ -39,7 +38,7 @@ brew install --cask qqlive
 brew install --cask qiyimedia
 
 # Install tools
-brew install yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cli
+brew install yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cli zoom
 
 # Install Fonts
 brew tap homebrew/cask-fonts
