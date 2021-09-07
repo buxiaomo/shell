@@ -21,7 +21,7 @@ brew install --cask bartender istat-menus tunnelblick balenaetcher parallels
 brew install --cask qqmusic qqlive qiyimedia
 
 # Install tools
-brew install yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cli zoom
+brew install ansible yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cli zoom
 
 # Install Fonts
 brew tap homebrew/cask-fonts
