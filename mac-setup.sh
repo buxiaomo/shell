@@ -10,22 +10,11 @@ brew install --cask google-chrome
 brew install --cask iterm2
 brew install --cask notion
 
-brew install --cask microsoft-outlook
-brew install --cask microsoft-powerpoint
-brew install --cask microsoft-word
-brew install --cask microsoft-auto-update
+brew install --cask microsoft-outlook microsoft-powerpoint microsoft-word microsoft-auto-update
 
-brew install --cask sourcetree
-brew install --cask pycharm
-brew install --cask goland
-brew install --cask visual-studio-code
-brew install --cask docker
-brew install --cask postman
+brew install --cask sourcetree pycharm goland visual-studio-code postman docker
 
-brew install --cask qq
-brew install --cask wechat
-brew install --cask wechatwork
-brew install --cask telegram-desktop
+brew install --cask qq wechat wechatwork telegram-desktop
 
 brew install --cask bartender
 brew install --cask istat-menus
@@ -33,9 +22,7 @@ brew install --cask tunnelblick
 brew install --cask balenaetcher
 brew install --cask parallels
 
-brew install --cask qqmusic
-brew install --cask qqlive
-brew install --cask qiyimedia
+brew install --cask qqmusic qqlive qiyimedia
 
 # Install tools
 brew install yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cli zoom
