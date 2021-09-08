@@ -10,7 +10,7 @@ brew install --cask google-chrome
 brew install --cask iterm2
 brew install --cask notion
 
-brew install --cask microsoft-outlook microsoft-powerpoint microsoft-word microsoft-auto-update
+brew install --cask microsoft-teams microsoft-outlook microsoft-powerpoint microsoft-word microsoft-auto-update
 
 brew install --cask sourcetree pycharm goland visual-studio-code postman docker
 
