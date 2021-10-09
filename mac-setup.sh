@@ -23,7 +23,7 @@ brew install --cask qqmusic qqlive qiyimedia
 brew install --cask thunder
 
 # Install tools
-brew install ansible yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cli zoom
+brew install ansible yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cli zoom pwgen
 
 # Install Fonts
 brew tap homebrew/cask-fonts
