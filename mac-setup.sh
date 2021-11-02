@@ -22,6 +22,8 @@ brew install --cask qqmusic qqlive qiyimedia
 
 brew install --cask thunder
 
+brew install --cask virtualbox
+
 # Install tools
 brew install ansible yq jq wget telnet curl zsh terraform go python@3 node kubernetes-cli zoom pwgen
 
