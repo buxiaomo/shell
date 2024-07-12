@@ -37,3 +37,5 @@ brew install esolitos/ipa/sshpass
 
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 omz plugin enable zsh-autosuggestions
+
+brew install sunnyyoung/repo/wechattweak-cli
