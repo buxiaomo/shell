@@ -39,3 +39,6 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 omz plugin enable zsh-autosuggestions
 
 brew install sunnyyoung/repo/wechattweak-cli
+
+
+brew install --casks sunloginclient tencent-meeting
