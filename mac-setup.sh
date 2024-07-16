@@ -12,7 +12,7 @@ brew install --cask notion
 
 brew install --cask microsoft-teams microsoft-excel microsoft-outlook microsoft-powerpoint microsoft-word microsoft-auto-update
 
-brew install --cask sourcetree pycharm goland visual-studio-code postman docker
+brew install --cask sourcetree pycharm goland visual-studio-code postman 
 
 brew install --cask qq wechat wechatwork telegram-desktop
 
@@ -42,3 +42,7 @@ brew install sunnyyoung/repo/wechattweak-cli
 
 
 brew install --casks sunloginclient tencent-meeting
+
+
+brew install colima kubectl docker
+colima start --arch x86_64 --cpu 4 --memory 4
