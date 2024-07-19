@@ -43,6 +43,10 @@ brew install sunnyyoung/repo/wechattweak-cli
 
 brew install --casks sunloginclient tencent-meeting
 
+brew install zsh-syntax-highlighting zsh-autosuggestions
+echo 'source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh' >> ~/.zshrc
+echo 'source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh' >> ~/.zshrc
 
 brew install colima kubectl docker
 colima start --arch x86_64 --cpu 4 --memory 4
+
